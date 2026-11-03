@@ -9,73 +9,56 @@ export default async function handler(req, res) {
   const { id } = req.query;
   if (!id) return res.status(400).send('Missing video ID');
 
-  const videoUrl = `https://www.youtube.com/watch?v=${id}`;
-
-  const cobaltInstances = [
-    "https://api.cobalt.tools/api/json",
-    "https://cobalt-api.kwiatekm.tokyo/api/json",
-    "https://api.server.ovh/api/json"
+  // 目前運作良好且不限速的專用 Piped API 節點群
+  const PIPED_APIS = [
+    "https://api.piped.private.coffee",
+    "https://pipedapi.leptons.xyz",
+    "https://pipedapi.nosebs.ru",
+    "https://pipedapi.r4fo.com"
   ];
 
-  let audioUrl = null;
-
-  for (const apiUrl of cobaltInstances) {
+  for (const host of PIPED_APIS) {
     try {
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 5000);
+      const timer = setTimeout(() => controller.abort(), 4000);
 
-      const resp = await fetch(apiUrl, {
-        method: "POST",
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/json",
-          "User-Agent": "Mozilla/5.0"
-        },
-        body: JSON.stringify({
-          url: videoUrl,
-          downloadMode: "audio",
-          audioFormat: "mp3"
-        }),
+      const resp = await fetch(`${host}/streams/${id}`, {
+        headers: { "User-Agent": "Mozilla/5.0" },
         signal: controller.signal
       });
-
       clearTimeout(timer);
+
       if (!resp.ok) continue;
-
       const data = await resp.json();
-      if (data && data.url) {
-        audioUrl = data.url;
-        break;
+
+      if (data && data.audioStreams && data.audioStreams.length > 0) {
+        // 優先揀選相容性最好的 m4a/aac 串流
+        const m4a = data.audioStreams.find(s => s.mimeType && s.mimeType.includes('mp4'));
+        const targetStream = m4a || data.audioStreams[0];
+
+        // 伺服器端抓取二進制數據管接至前端，突破 IP 鎖
+        const audioFetch = await fetch(targetStream.url, {
+          headers: {
+            "User-Agent": "Mozilla/5.0",
+            "Referer": "https://www.youtube.com/"
+          }
+        });
+
+        if (audioFetch.ok && audioFetch.body) {
+          res.setHeader('Content-Type', audioFetch.headers.get('content-type') || 'audio/mp4');
+          const reader = audioFetch.body.getReader();
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            res.write(value);
+          }
+          return res.end();
+        }
       }
-    } catch (e) {}
-  }
-
-  // 若 Cobalt 實例均忙，使用 Invidious 專用音訊中轉
-  if (!audioUrl) {
-    audioUrl = `https://invidious.nerdvpn.de/latest_version?id=${id}&itag=140&local=true`;
-  }
-
-  try {
-    const audioResp = await fetch(audioUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-      }
-    });
-
-    if (!audioResp.ok) throw new Error("Audio source failed");
-
-    res.setHeader('Content-Type', audioResp.headers.get('content-type') || 'audio/mp4');
-    const contentLength = audioResp.headers.get('content-length');
-    if (contentLength) res.setHeader('Content-Length', contentLength);
-
-    const reader = audioResp.body.getReader();
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      res.write(value);
+    } catch (e) {
+      // 嘗試下一組節點
     }
-    return res.end();
-  } catch (err) {
-    return res.status(502).send('Stream error');
   }
+
+  return res.status(502).send('No stream available');
 }
