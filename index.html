@@ -12,24 +12,13 @@
   <style>
     :root {
       --sp-green: #1DB954;
-      --sp-green-light: #1ed760;
       --sp-black: #121212;
-      --sp-elevated: #181818;
-      --sp-highlight: #282828;
       --sp-subtext: #a7a7a7;
       --sp-white: #ffffff;
       --sp-danger: #f15e6c;
       --sp-moon: #a29bfe;
     }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       background-color: var(--sp-black);
@@ -41,492 +30,84 @@
       overflow: hidden;
       padding-top: env(safe-area-inset-top);
     }
-
-    header {
-      padding: 12px 12px 6px;
-      flex-shrink: 0;
-    }
-
-    .brand-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 6px;
-    }
-
-    .brand-left {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      flex-shrink: 0;
-    }
-
-    .brand-title {
-      font-size: 1.05rem;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      white-space: nowrap;
-    }
-
-    .brand-title i {
-      color: var(--sp-green);
-      font-size: 1.35rem;
-    }
-
+    header { padding: 12px 12px 6px; flex-shrink: 0; }
+    .brand-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+    .brand-left { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .brand-title { font-size: 1.05rem; font-weight: 800; display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+    .brand-title i { color: var(--sp-green); font-size: 1.35rem; }
     .sleep-btn {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      color: var(--sp-subtext);
-      padding: 6px 10px;
-      border-radius: 18px;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      white-space: nowrap;
-      flex-shrink: 0;
-      font-variant-numeric: tabular-nums;
+      background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--sp-subtext); padding: 6px 10px; border-radius: 18px; font-size: 12px; font-weight: 700;
+      cursor: pointer; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;
     }
-
-    .sleep-btn.active {
-      background: rgba(162, 155, 254, 0.18);
-      border-color: var(--sp-moon);
-      color: var(--sp-moon);
-    }
-
-    .nav-pills {
-      display: flex;
-      gap: 3px;
-      background: rgba(255, 255, 255, 0.08);
-      padding: 3px;
-      border-radius: 24px;
-      flex-shrink: 0;
-    }
-
+    .sleep-btn.active { background: rgba(162, 155, 254, 0.18); border-color: var(--sp-moon); color: var(--sp-moon); }
+    .nav-pills { display: flex; gap: 3px; background: rgba(255, 255, 255, 0.08); padding: 3px; border-radius: 24px; }
     .pill-btn {
-      padding: 6px 10px;
-      border-radius: 20px;
-      border: none;
-      background: transparent;
-      color: var(--sp-subtext);
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      white-space: nowrap;
+      padding: 6px 10px; border-radius: 20px; border: none; background: transparent;
+      color: var(--sp-subtext); font-size: 12px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;
     }
-
-    .pill-btn.active {
-      background: var(--sp-green);
-      color: #000;
-    }
-
-    .search-wrapper {
-      padding: 6px 12px 10px;
-      display: flex;
-      gap: 8px;
-      flex-shrink: 0;
-    }
-
-    .search-input-box {
-      position: relative;
-      flex: 1;
-      display: flex;
-      align-items: center;
-    }
-
-    .search-input-box i.search-icon {
-      position: absolute;
-      left: 14px;
-      color: #888;
-      font-size: 14px;
-      pointer-events: none;
-    }
-
-    .clear-btn {
-      position: absolute;
-      right: 10px;
-      background: none;
-      border: none;
-      color: #888;
-      font-size: 16px;
-      padding: 4px 6px;
-      cursor: pointer;
-    }
-
+    .pill-btn.active { background: var(--sp-green); color: #000; }
+    .search-wrapper { padding: 6px 12px 10px; display: flex; gap: 8px; flex-shrink: 0; }
+    .search-input-box { position: relative; flex: 1; display: flex; align-items: center; }
+    .search-input-box i.search-icon { position: absolute; left: 14px; color: #888; font-size: 14px; pointer-events: none; }
+    .clear-btn { position: absolute; right: 10px; background: none; border: none; color: #888; font-size: 16px; padding: 4px 6px; cursor: pointer; }
     input[type="text"] {
-      width: 100%;
-      padding: 10px 34px 10px 36px;
-      border-radius: 24px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: #242424;
-      color: #fff;
-      font-size: 15px;
-      outline: none;
+      width: 100%; padding: 10px 34px 10px 36px; border-radius: 24px; border: 1px solid rgba(255, 255, 255, 0.12);
+      background: #242424; color: #fff; font-size: 15px; outline: none;
     }
-
-    input[type="text"]:focus {
-      border-color: var(--sp-green);
-      background: #2a2a2a;
-    }
-
     .search-submit-btn {
-      padding: 0 16px;
-      border-radius: 24px;
-      border: none;
-      background: var(--sp-green);
-      color: #000;
-      font-weight: 700;
-      font-size: 14px;
-      cursor: pointer;
-      flex-shrink: 0;
-      white-space: nowrap;
+      padding: 0 16px; border-radius: 24px; border: none; background: var(--sp-green);
+      color: #000; font-weight: 700; font-size: 14px; cursor: pointer; flex-shrink: 0; white-space: nowrap;
     }
-
-    .playlist-toolbar {
-      padding: 4px 12px 10px;
-      display: none;
-      justify-content: space-between;
-      align-items: center;
-      flex-shrink: 0;
-    }
-
+    .playlist-toolbar { padding: 4px 12px 10px; display: none; justify-content: space-between; align-items: center; flex-shrink: 0; }
     .tool-btn {
-      background: #242424;
-      border: 1px solid #333;
-      color: var(--sp-white);
-      padding: 7px 12px;
-      border-radius: 16px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      white-space: nowrap;
+      background: #242424; border: 1px solid #333; color: var(--sp-white); padding: 7px 12px;
+      border-radius: 16px; font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
     }
-
-    main {
-      flex: 1;
-      overflow-y: auto;
-      padding: 4px 12px 175px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .section-header {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--sp-subtext);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      margin: 6px 4px 2px;
-    }
-
-    .track-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 8px 10px;
-      background: rgba(255, 255, 255, 0.04);
-      border-radius: 10px;
-      cursor: pointer;
-    }
-
-    .track-item:active {
-      background: var(--sp-highlight);
-    }
-
-    .track-item.active-track {
-      background: rgba(29, 185, 84, 0.18);
-      border-left: 3px solid var(--sp-green);
-    }
-
-    .track-item.active-track .track-title {
-      color: var(--sp-green);
-      font-weight: 700;
-    }
-
-    .thumb-wrap {
-      position: relative;
-      width: 54px;
-      height: 54px;
-      flex-shrink: 0;
-      border-radius: 6px;
-      overflow: hidden;
-      background: #222;
-    }
-
-    .thumb-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .duration-badge {
-      position: absolute;
-      bottom: 3px;
-      right: 3px;
-      background: rgba(0, 0, 0, 0.8);
-      color: #fff;
-      font-size: 10px;
-      padding: 1px 4px;
-      border-radius: 3px;
-      font-weight: 600;
-    }
-
-    .track-info {
-      flex: 1;
-      min-width: 0;
-      padding: 2px 0;
-    }
-
-    .track-title {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--sp-white);
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      line-height: 1.3;
-      margin-bottom: 3px;
-    }
-
-    .track-meta {
-      font-size: 12px;
-      color: var(--sp-subtext);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .btn-fav {
-      background: none;
-      border: none;
-      color: var(--sp-subtext);
-      font-size: 19px;
-      width: 40px;
-      height: 40px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .btn-fav.saved {
-      color: var(--sp-green);
-    }
-
+    main { flex: 1; overflow-y: auto; padding: 4px 12px 175px; display: flex; flex-direction: column; gap: 8px; -webkit-overflow-scrolling: touch; }
+    .section-header { font-size: 12px; font-weight: 700; color: var(--sp-subtext); text-transform: uppercase; margin: 6px 4px 2px; }
+    .track-item { display: flex; align-items: center; gap: 12px; padding: 8px 10px; background: rgba(255, 255, 255, 0.04); border-radius: 10px; cursor: pointer; }
+    .track-item:active { background: #282828; }
+    .track-item.active-track { background: rgba(29, 185, 84, 0.18); border-left: 3px solid var(--sp-green); }
+    .thumb-wrap { position: relative; width: 54px; height: 54px; flex-shrink: 0; border-radius: 6px; overflow: hidden; background: #222; }
+    .thumb-img { width: 100%; height: 100%; object-fit: cover; }
+    .duration-badge { position: absolute; bottom: 3px; right: 3px; background: rgba(0,0,0,0.8); color: #fff; font-size: 10px; padding: 1px 4px; border-radius: 3px; }
+    .track-info { flex: 1; min-width: 0; padding: 2px 0; }
+    .track-title { font-size: 14px; font-weight: 500; color: var(--sp-white); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3; }
+    .track-meta { font-size: 12px; color: var(--sp-subtext); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 3px; }
+    .btn-fav { background: none; border: none; color: var(--sp-subtext); font-size: 19px; width: 40px; height: 40px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .btn-fav.saved { color: var(--sp-green); }
     footer {
-      position: fixed;
-      bottom: calc(10px + env(safe-area-inset-bottom));
-      left: 10px;
-      right: 10px;
-      background: rgba(28, 28, 28, 0.96);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 16px;
-      padding: 10px 14px;
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.75);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      z-index: 100;
+      position: fixed; bottom: calc(10px + env(safe-area-inset-bottom)); left: 10px; right: 10px;
+      background: rgba(28, 28, 28, 0.96); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px; padding: 10px 14px; box-shadow: 0 12px 32px rgba(0,0,0,0.75); display: flex; flex-direction: column; gap: 8px; z-index: 100;
     }
-
-    .player-top {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .player-cover {
-      width: 46px;
-      height: 46px;
-      border-radius: 8px;
-      object-fit: cover;
-      background: #282828;
-      flex-shrink: 0;
-    }
-
-    .player-text {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .player-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--sp-white);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .player-status {
-      font-size: 11.5px;
-      color: var(--sp-subtext);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      margin-top: 2px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .hq-badge {
-      background: rgba(29, 185, 84, 0.2);
-      color: var(--sp-green);
-      border: 1px solid rgba(29, 185, 84, 0.4);
-      font-size: 10px;
-      font-weight: 700;
-      padding: 1px 5px;
-      border-radius: 4px;
-      flex-shrink: 0;
-    }
-
-    .player-controls {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .ctrl-btn {
-      background: none;
-      border: none;
-      color: var(--sp-white);
-      width: 36px;
-      height: 36px;
-      font-size: 17px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .ctrl-btn.play-main {
-      width: 42px;
-      height: 42px;
-      background: var(--sp-green);
-      color: #000;
-      border-radius: 50%;
-      font-size: 16px;
-      box-shadow: 0 2px 10px rgba(29, 185, 84, 0.4);
-    }
-
-    .seek-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .time-label {
-      font-size: 10.5px;
-      color: var(--sp-subtext);
-      font-variant-numeric: tabular-nums;
-      min-width: 32px;
-    }
-
-    .time-label.right {
-      text-align: right;
-    }
-
-    input[type="range"].seek-slider {
-      flex: 1;
-      -webkit-appearance: none;
-      appearance: none;
-      height: 4px;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 2px;
-      outline: none;
-    }
-
-    input[type="range"].seek-slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: var(--sp-green);
-      cursor: pointer;
-    }
-
-    .empty-state {
-      text-align: center;
-      color: var(--sp-subtext);
-      margin-top: 50px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-      padding: 0 20px;
-      line-height: 1.5;
-      font-size: 14px;
-    }
-
-    .empty-state i {
-      font-size: 44px;
-      color: #333;
-    }
-
-    #toastMsg {
-      position: fixed;
-      top: calc(64px + env(safe-area-inset-top));
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(30, 30, 36, 0.95);
-      border: 1px solid var(--sp-moon);
-      color: #fff;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: 600;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.6);
-      z-index: 200;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.25s ease;
-      white-space: nowrap;
-    }
+    .player-top { display: flex; align-items: center; gap: 12px; }
+    .player-cover { width: 46px; height: 46px; border-radius: 8px; object-fit: cover; background: #282828; flex-shrink: 0; }
+    .player-text { flex: 1; min-width: 0; }
+    .player-title { font-size: 14px; font-weight: 700; color: var(--sp-white); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .player-status { font-size: 11.5px; color: var(--sp-subtext); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+    .player-controls { display: flex; align-items: center; gap: 6px; }
+    .ctrl-btn { background: none; border: none; color: var(--sp-white); width: 36px; height: 36px; font-size: 17px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .ctrl-btn.play-main { width: 42px; height: 42px; background: var(--sp-green); color: #000; border-radius: 50%; font-size: 16px; }
+    .seek-row { display: flex; align-items: center; gap: 8px; }
+    .time-label { font-size: 10.5px; color: var(--sp-subtext); font-variant-numeric: tabular-nums; min-width: 32px; }
+    input[type="range"].seek-slider { flex: 1; -webkit-appearance: none; height: 4px; background: rgba(255, 255, 255, 0.2); border-radius: 2px; outline: none; }
+    input[type="range"].seek-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: var(--sp-green); }
+    .empty-state { text-align: center; color: var(--sp-subtext); margin-top: 50px; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 0 20px; font-size: 14px; }
   </style>
 </head>
 <body>
 
-  <div id="toastMsg">🌙 睡眠定時已設定</div>
-
   <header>
     <div class="brand-row">
       <div class="brand-left">
-        <div class="brand-title">
-          <i class="fa-brands fa-spotify"></i>
-          <span>Tube</span>
-        </div>
-        <button class="sleep-btn" id="sleepBtn" onclick="cycleSleepTimer()">
-          <i class="fa-solid fa-moon"></i>
-          <span id="sleepLabel">定時</span>
-        </button>
+        <div class="brand-title"><i class="fa-brands fa-spotify"></i><span>Tube</span></div>
+        <button class="sleep-btn" id="sleepBtn" onclick="cycleSleepTimer()"><i class="fa-solid fa-moon"></i><span id="sleepLabel">定時</span></button>
       </div>
-
       <div class="nav-pills">
-        <button class="pill-btn active" id="tabSearch" onclick="switchTab('search')">
-          <i class="fa-solid fa-magnifying-glass"></i> 搜尋
-        </button>
-        <button class="pill-btn" id="tabPlaylist" onclick="switchTab('playlist')">
-          <i class="fa-solid fa-heart"></i> 歌單 (<span id="plCount">0</span>)
-        </button>
+        <button class="pill-btn active" id="tabSearch" onclick="switchTab('search')"><i class="fa-solid fa-magnifying-glass"></i> 搜尋</button>
+        <button class="pill-btn" id="tabPlaylist" onclick="switchTab('playlist')"><i class="fa-solid fa-heart"></i> 歌單 (<span id="plCount">0</span>)</button>
       </div>
     </div>
   </header>
@@ -535,90 +116,46 @@
     <div class="search-input-box">
       <i class="fa-solid fa-magnifying-glass search-icon"></i>
       <input type="text" id="keyword" placeholder="輸入歌手、歌名..." value="陳奕迅">
-      <button class="clear-btn" onclick="clearSearchInput()" title="清除">
-        <i class="fa-solid fa-circle-xmark"></i>
-      </button>
+      <button class="clear-btn" onclick="clearSearchInput()"><i class="fa-solid fa-circle-xmark"></i></button>
     </div>
     <button class="search-submit-btn" onclick="searchVideos()">搜尋</button>
   </div>
 
   <div class="playlist-toolbar" id="playlistToolbar">
-    <button class="tool-btn" onclick="shufflePlay()">
-      <i class="fa-solid fa-shuffle" style="color:var(--sp-green)"></i> 隨機播放
-    </button>
-    <div style="display:flex; gap:6px;">
-      <button class="tool-btn" onclick="exportPlaylist()">匯出備份</button>
-      <button class="tool-btn" onclick="importPlaylist()">匯入</button>
-    </div>
+    <button class="tool-btn" onclick="shufflePlay()"><i class="fa-solid fa-shuffle" style="color:var(--sp-green)"></i> 隨機播放</button>
   </div>
 
   <main id="contentList">
-    <div class="empty-state">
-      <i class="fa-solid fa-compact-disc"></i>
-      <div>點擊右上「搜尋」制搵歌，支援熄畫面鎖屏連續播放</div>
-    </div>
+    <div class="empty-state"><i class="fa-solid fa-compact-disc" style="font-size:44px;color:#333;"></i><div>點擊「搜尋」搵歌，支援熄畫面鎖屏連續播放</div></div>
   </main>
 
   <footer>
     <div class="player-top">
-      <img id="npThumb" class="player-cover" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='46' height='46' viewBox='0 0 24 24' fill='%23282828'%3E%3Crect width='24' height='24'/%3E%3C/svg%3E" alt="Cover">
-      
+      <img id="npThumb" class="player-cover" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='46' height='46' viewBox='0 0 24 24' fill='%23282828'%3E%3Crect width='24' height='24'/%3E%3C/svg%3E">
       <div class="player-text">
         <div id="npTitle" class="player-title">準備就緒</div>
         <div id="npArtist" class="player-status">揀選歌曲開始鎖屏播放</div>
       </div>
-
       <div class="player-controls">
-        <button class="ctrl-btn" onclick="playPrev()" title="上一首">
-          <i class="fa-solid fa-backward-step"></i>
-        </button>
-        <button class="ctrl-btn play-main" id="playToggleBtn" onclick="togglePlayPause()">
-          <i class="fa-solid fa-play" id="playIcon"></i>
-        </button>
-        <button class="ctrl-btn" onclick="playNext()" title="下一首">
-          <i class="fa-solid fa-forward-step"></i>
-        </button>
+        <button class="ctrl-btn" onclick="playPrev()"><i class="fa-solid fa-backward-step"></i></button>
+        <button class="ctrl-btn play-main" id="playToggleBtn" onclick="togglePlayPause()"><i class="fa-solid fa-play" id="playIcon"></i></button>
+        <button class="ctrl-btn" onclick="playNext()"><i class="fa-solid fa-forward-step"></i></button>
       </div>
     </div>
-
     <div class="seek-row">
       <span class="time-label" id="currTime">0:00</span>
       <input type="range" class="seek-slider" id="seekSlider" min="0" max="100" value="0">
-      <span class="time-label right" id="totalTime">0:00</span>
+      <span class="time-label" style="text-align:right" id="totalTime">0:00</span>
     </div>
-
     <audio id="audioPlayer" preload="auto" playsinline></audio>
   </footer>
 
   <script>
-    // 綁定專屬 Vercel 後端中轉水喉
-    const MY_VERCEL_API = "https://yt-music-silk.vercel.app/api/stream";
-
-    const INVIDIOUS_HOSTS = [
-      "https://inv.tux.pizza",
-      "https://invidious.nerdvpn.de",
-      "https://invidious.privacyredirect.com",
-      "https://yt.artemislena.eu",
-      "https://invidious.jing.rocks"
-    ];
-
-    const CORS_PROXIES = [
-      (url) => url,
-      (url) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
-      (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
-    ];
-
     let currentTab = 'search';
-    let playlist = JSON.parse(localStorage.getItem('my_yt_playlist_v2') || localStorage.getItem('my_yt_playlist') || '[]');
+    let playlist = JSON.parse(localStorage.getItem('my_yt_playlist_v2') || '[]');
     let currentTrack = null;
     let searchResults = [];
     let isSeeking = false;
-
-    const SLEEP_OPTIONS = [0, 15, 30, 45, 60, 90];
-    let sleepOptionIndex = 0;
-    let sleepRemainingSec = 0;
-    let sleepIntervalId = null;
-    let toastTimer = null;
 
     const audio = document.getElementById('audioPlayer');
     const playIcon = document.getElementById('playIcon');
@@ -626,85 +163,9 @@
     const currTimeLabel = document.getElementById('currTime');
     const totalTimeLabel = document.getElementById('totalTime');
 
-    updatePlaylistCount();
+    document.getElementById('plCount').innerText = playlist.length;
 
-    function showToast(msg) {
-      const toast = document.getElementById('toastMsg');
-      toast.innerText = msg;
-      toast.style.opacity = '1';
-      if (toastTimer) clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => {
-        toast.style.opacity = '0';
-      }, 2400);
-    }
-
-    function cycleSleepTimer() {
-      sleepOptionIndex = (sleepOptionIndex + 1) % SLEEP_OPTIONS.length;
-      const mins = SLEEP_OPTIONS[sleepOptionIndex];
-      const sleepBtn = document.getElementById('sleepBtn');
-      const sleepLabel = document.getElementById('sleepLabel');
-
-      if (sleepIntervalId) {
-        clearInterval(sleepIntervalId);
-        sleepIntervalId = null;
-      }
-      audio.volume = 1.0;
-
-      if (mins === 0) {
-        sleepRemainingSec = 0;
-        sleepBtn.classList.remove('active');
-        sleepLabel.innerText = '定時';
-        showToast('🌙 睡眠定時已關閉');
-        return;
-      }
-
-      sleepRemainingSec = mins * 60;
-      sleepBtn.classList.add('active');
-      updateSleepLabel();
-      showToast(`🌙 將在 ${mins} 分鐘後自動漸弱停播`);
-
-      sleepIntervalId = setInterval(() => {
-        sleepRemainingSec--;
-        updateSleepLabel();
-
-        if (sleepRemainingSec <= 10 && sleepRemainingSec > 0) {
-          audio.volume = Math.max(0.05, sleepRemainingSec / 10);
-        }
-
-        if (sleepRemainingSec <= 0) {
-          clearInterval(sleepIntervalId);
-          sleepIntervalId = null;
-          audio.pause();
-          audio.volume = 1.0;
-          sleepOptionIndex = 0;
-          sleepBtn.classList.remove('active');
-          sleepLabel.innerText = '定時';
-          showToast('💤 睡眠定時已到，晚安！');
-        }
-      }, 1000);
-    }
-
-    function updateSleepLabel() {
-      const sleepLabel = document.getElementById('sleepLabel');
-      const m = Math.floor(sleepRemainingSec / 60);
-      const s = sleepRemainingSec % 60;
-      sleepLabel.innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
-    }
-
-    function savePlaylistToStorage() {
-      localStorage.setItem('my_yt_playlist_v2', JSON.stringify(playlist));
-      updatePlaylistCount();
-    }
-
-    function updatePlaylistCount() {
-      document.getElementById('plCount').innerText = playlist.length;
-    }
-
-    function clearSearchInput() {
-      const input = document.getElementById('keyword');
-      input.value = '';
-      input.focus();
-    }
+    function clearSearchInput() { document.getElementById('keyword').value = ''; }
 
     function switchTab(tab) {
       currentTab = tab;
@@ -712,121 +173,50 @@
       document.getElementById('tabPlaylist').className = 'pill-btn ' + (tab === 'playlist' ? 'active' : '');
       document.getElementById('searchSection').style.display = tab === 'search' ? 'flex' : 'none';
       document.getElementById('playlistToolbar').style.display = tab === 'playlist' ? 'flex' : 'none';
-
-      if (tab === 'playlist') {
-        renderPlaylist();
-      } else {
-        renderSearchResults();
-      }
+      if (tab === 'playlist') renderPlaylist(); else renderSearchResults();
     }
 
-    async function fetchWithTimeout(url, timeoutMs = 6000) {
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), timeoutMs);
-      try {
-        const res = await fetch(url, { signal: controller.signal });
-        clearTimeout(timer);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return await res.json();
-      } catch (err) {
-        clearTimeout(timer);
-        throw err;
-      }
-    }
-
-    async function smartSearch(query) {
-      const q = encodeURIComponent(query);
-      const tasks = [];
-
-      for (const host of INVIDIOUS_HOSTS) {
-        for (const wrap of CORS_PROXIES) {
-          const target = wrap(`${host}/api/v1/search?q=${q}&type=video`);
-          tasks.push(
-            fetchWithTimeout(target, 6000).then(data => {
-              if (!Array.isArray(data) || data.length === 0) throw new Error("Empty");
-              return data.filter(i => i.videoId).map(i => ({
-                id: i.videoId,
-                title: i.title || '未知標題',
-                author: i.author || 'YouTube',
-                thumb: `https://i.ytimg.com/vi/${i.videoId}/hqdefault.jpg`,
-                duration: i.lengthSeconds || 0
-              }));
-            })
-          );
-        }
-      }
-
-      return await Promise.any(tasks);
-    }
-
+    // 直接透過自家 Vercel API 搜尋，解決手機直接連線被擋問題
     async function searchVideos() {
-      const input = document.getElementById('keyword');
-      const q = input.value.trim();
+      const q = document.getElementById('keyword').value.trim();
       if (!q) return;
-      input.blur();
 
       const list = document.getElementById('contentList');
-      list.innerHTML = `
-        <div class="empty-state">
-          <i class="fa-solid fa-circle-notch fa-spin" style="color: var(--sp-green)"></i>
-          <div>正在搜尋「${escapeHtml(q)}」...</div>
-        </div>
-      `;
+      list.innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-notch fa-spin" style="color:var(--sp-green);font-size:36px;"></i><div>正在搜尋...</div></div>`;
 
       try {
-        searchResults = await smartSearch(q);
+        const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
+        if (!res.ok) throw new Error();
+        searchResults = await res.json();
         renderSearchResults();
       } catch (err) {
-        list.innerHTML = `
-          <div class="empty-state">
-            <i class="fa-solid fa-wifi" style="color: var(--sp-danger)"></i>
-            <div>搜尋連線逾時，請再撳一次「搜尋」重試</div>
-          </div>
-        `;
+        list.innerHTML = `<div class="empty-state"><i class="fa-solid fa-wifi" style="color:var(--sp-danger);font-size:36px;"></i><div>連線繁忙，請再撳一次搜尋</div></div>`;
       }
     }
 
     function renderSearchResults() {
       const list = document.getElementById('contentList');
-      if (searchResults.length === 0) {
-        list.innerHTML = `
-          <div class="empty-state">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <div>輸入關鍵字並點擊「搜尋」按鈕</div>
-          </div>
-        `;
+      if (!searchResults || searchResults.length === 0) {
+        list.innerHTML = `<div class="empty-state"><i class="fa-solid fa-magnifying-glass" style="font-size:40px;"></i><div>冇搵到歌曲，試下其他關鍵字</div></div>`;
         return;
       }
 
       list.innerHTML = `<div class="section-header">搜尋結果 (${searchResults.length})</div>`;
       searchResults.forEach(track => {
         const inPl = playlist.some(p => p.id === track.id);
-        const isActive = currentTrack && currentTrack.id === track.id;
-
         const row = document.createElement('div');
-        row.className = `track-item ${isActive ? 'active-track' : ''}`;
-
+        row.className = `track-item ${currentTrack && currentTrack.id === track.id ? 'active-track' : ''}`;
         row.innerHTML = `
-          <div class="thumb-wrap">
-            <img class="thumb-img" src="${track.thumb}" loading="lazy" alt="thumb">
-            ${track.duration ? `<span class="duration-badge">${formatTime(track.duration)}</span>` : ''}
-          </div>
+          <div class="thumb-wrap"><img class="thumb-img" src="${track.thumb}"></div>
           <div class="track-info">
             <div class="track-title">${escapeHtml(track.title)}</div>
             <div class="track-meta">${escapeHtml(track.author)}</div>
           </div>
-          <button class="btn-fav ${inPl ? 'saved' : ''}" aria-label="收藏">
-            <i class="${inPl ? 'fa-solid fa-heart' : 'fa-regular fa-heart'}"></i>
-          </button>
+          <button class="btn-fav ${inPl ? 'saved' : ''}"><i class="${inPl ? 'fa-solid' : 'fa-regular'} fa-heart"></i></button>
         `;
-
-        row.querySelector('.thumb-wrap').addEventListener('click', () => startPlay(track));
-        row.querySelector('.track-info').addEventListener('click', () => startPlay(track));
-        row.querySelector('.btn-fav').addEventListener('click', (e) => {
-          e.stopPropagation();
-          togglePlaylist(track);
-        });
-
+        row.querySelector('.track-info').onclick = () => startPlay(track);
+        row.querySelector('.thumb-wrap').onclick = () => startPlay(track);
+        row.querySelector('.btn-fav').onclick = (e) => { e.stopPropagation(); togglePlaylist(track); };
         list.appendChild(row);
       });
     }
@@ -834,289 +224,123 @@
     function renderPlaylist() {
       const list = document.getElementById('contentList');
       if (playlist.length === 0) {
-        list.innerHTML = `
-          <div class="empty-state">
-            <i class="fa-regular fa-heart"></i>
-            <div>歌單暫未有歌<br>在「搜尋」點愛心收藏</div>
-          </div>
-        `;
+        list.innerHTML = `<div class="empty-state"><i class="fa-regular fa-heart" style="font-size:40px;"></i><div>歌單暫未有歌，請去「搜尋」加歌</div></div>`;
         return;
       }
-
-      list.innerHTML = `<div class="section-header">我的收藏歌單 (${playlist.length} 首)</div>`;
+      list.innerHTML = `<div class="section-header">我的歌單 (${playlist.length})</div>`;
       playlist.forEach((track, idx) => {
-        const isActive = currentTrack && currentTrack.id === track.id;
         const row = document.createElement('div');
-        row.className = `track-item ${isActive ? 'active-track' : ''}`;
-
+        row.className = `track-item ${currentTrack && currentTrack.id === track.id ? 'active-track' : ''}`;
         row.innerHTML = `
-          <div class="thumb-wrap">
-            <img class="thumb-img" src="${track.thumb}" loading="lazy" alt="thumb">
-          </div>
+          <div class="thumb-wrap"><img class="thumb-img" src="${track.thumb}"></div>
           <div class="track-info">
             <div class="track-title">${idx + 1}. ${escapeHtml(track.title)}</div>
             <div class="track-meta">${escapeHtml(track.author)}</div>
           </div>
-          <button class="btn-fav" aria-label="刪除">
-            <i class="fa-solid fa-trash-can" style="font-size:15px; color:#777;"></i>
-          </button>
+          <button class="btn-fav"><i class="fa-solid fa-trash-can" style="font-size:15px;color:#777;"></i></button>
         `;
-
-        row.querySelector('.thumb-wrap').addEventListener('click', () => startPlay(track));
-        row.querySelector('.track-info').addEventListener('click', () => startPlay(track));
-        row.querySelector('.btn-fav').addEventListener('click', (e) => {
+        row.querySelector('.track-info').onclick = () => startPlay(track);
+        row.querySelector('.thumb-wrap').onclick = () => startPlay(track);
+        row.querySelector('.btn-fav').onclick = (e) => {
           e.stopPropagation();
-          removeFromPlaylist(track.id);
-        });
-
+          playlist = playlist.filter(p => p.id !== track.id);
+          localStorage.setItem('my_yt_playlist_v2', JSON.stringify(playlist));
+          document.getElementById('plCount').innerText = playlist.length;
+          renderPlaylist();
+        };
         list.appendChild(row);
       });
     }
 
     function togglePlaylist(track) {
       const idx = playlist.findIndex(p => p.id === track.id);
-      if (idx > -1) {
-        playlist.splice(idx, 1);
-      } else {
-        playlist.push({
-          id: track.id,
-          title: track.title,
-          author: track.author,
-          thumb: track.thumb
-        });
-      }
-      savePlaylistToStorage();
+      if (idx > -1) playlist.splice(idx, 1);
+      else playlist.push(track);
+      localStorage.setItem('my_yt_playlist_v2', JSON.stringify(playlist));
+      document.getElementById('plCount').innerText = playlist.length;
       renderSearchResults();
     }
 
-    function removeFromPlaylist(id) {
-      playlist = playlist.filter(p => p.id !== id);
-      savePlaylistToStorage();
-      renderPlaylist();
-    }
-
-    function updateLockscreenPosition() {
-      if ('mediaSession' in navigator && 'setPositionState' in navigator.mediaSession) {
-        if (audio.duration && !isNaN(audio.duration) && isFinite(audio.duration)) {
-          try {
-            navigator.mediaSession.setPositionState({
-              duration: audio.duration,
-              playbackRate: audio.playbackRate || 1,
-              position: Math.min(audio.currentTime, audio.duration)
-            });
-          } catch (e) {}
-        }
-      }
-    }
-
-    // 經由 Vercel 專屬中轉水喉播放
-    async function startPlay(track) {
+    // 播放歌曲：直接透過同源 Vercel API
+    function startPlay(track) {
       currentTrack = track;
+      document.getElementById('npTitle').innerText = track.title;
+      document.getElementById('npArtist').innerText = "⏳ 正在載入音訊...";
+      document.getElementById('npThumb').src = track.thumb;
 
-      const npTitle = document.getElementById('npTitle');
-      const npArtist = document.getElementById('npArtist');
-      const npThumb = document.getElementById('npThumb');
-
-      npTitle.innerText = track.title;
-      npArtist.innerHTML = "⏳ 正在透過專屬 Vercel 後端連線串流...";
-      npThumb.src = track.thumb;
-
-      if (currentTab === 'search') renderSearchResults();
-      if (currentTab === 'playlist') renderPlaylist();
-
-      // 直接調用你個人的專屬 Vercel 轉發接口，徹底突破 IP 鎖
-      audio.src = `${MY_VERCEL_API}?id=${track.id}`;
+      audio.src = `/api/stream?id=${track.id}`;
       audio.load();
 
-      if (sleepRemainingSec > 10 || sleepRemainingSec === 0) {
-        audio.volume = 1.0;
-      }
-
-      // 註冊手機鎖屏控制器
       if ('mediaSession' in navigator) {
         navigator.mediaSession.metadata = new MediaMetadata({
           title: track.title,
           artist: track.author,
-          album: 'TubeAudio Pro',
-          artwork: [
-            { src: track.thumb, sizes: '96x96', type: 'image/jpeg' },
-            { src: track.thumb, sizes: '256x256', type: 'image/jpeg' },
-            { src: track.thumb, sizes: '512x512', type: 'image/jpeg' }
-          ]
+          artwork: [{ src: track.thumb, sizes: '512x512', type: 'image/jpeg' }]
         });
-
         navigator.mediaSession.setActionHandler('play', () => audio.play());
         navigator.mediaSession.setActionHandler('pause', () => audio.pause());
         navigator.mediaSession.setActionHandler('previoustrack', () => playPrev());
         navigator.mediaSession.setActionHandler('nexttrack', () => playNext());
-
-        navigator.mediaSession.setActionHandler('seekbackward', (details) => {
-          const skipTime = details.seekOffset || 10;
-          audio.currentTime = Math.max(audio.currentTime - skipTime, 0);
-          updateLockscreenPosition();
-        });
-        navigator.mediaSession.setActionHandler('seekforward', (details) => {
-          const skipTime = details.seekOffset || 10;
-          audio.currentTime = Math.min(audio.currentTime + skipTime, audio.duration || 0);
-          updateLockscreenPosition();
-        });
-
-        navigator.mediaSession.setActionHandler('seekto', (details) => {
-          if (details.fastSeek && 'fastSeek' in audio) {
-            audio.fastSeek(details.seekTime);
-          } else {
-            audio.currentTime = details.seekTime;
-          }
-          updateLockscreenPosition();
-        });
       }
 
       audio.play().then(() => {
-        npArtist.innerHTML = `<span class="hq-badge">VERCEL PROXY</span> <span>${escapeHtml(track.author)}</span>`;
-        setPlayState(true);
-      }).catch((e) => {
-        console.warn("自動播放攔截或等待中...", e);
+        document.getElementById('npArtist').innerText = track.author;
+        playIcon.className = 'fa-solid fa-pause';
+      }).catch(() => {
+        document.getElementById('npArtist').innerText = "點擊播放鍵開始";
       });
     }
 
-    audio.addEventListener('error', () => {
-      const npArtist = document.getElementById('npArtist');
-      npArtist.innerHTML = "⚠️ 串流準備中，請點一下綠色播放掣";
-      setPlayState(false);
-    });
-
     function togglePlayPause() {
-      if (!audio.src) {
-        if (playlist.length > 0) startPlay(playlist[0]);
-        return;
-      }
-      if (audio.paused) {
-        audio.play();
-      } else {
-        audio.pause();
-      }
-    }
-
-    function setPlayState(playing) {
-      playIcon.className = playing ? 'fa-solid fa-pause' : 'fa-solid fa-play';
-      if ('mediaSession' in navigator) {
-        navigator.mediaSession.playbackState = playing ? 'playing' : 'paused';
-      }
+      if (!audio.src) { if (playlist.length > 0) startPlay(playlist[0]); return; }
+      if (audio.paused) { audio.play(); playIcon.className = 'fa-solid fa-pause'; }
+      else { audio.pause(); playIcon.className = 'fa-solid fa-play'; }
     }
 
     function playNext() {
       const list = playlist.length > 0 ? playlist : searchResults;
       if (list.length === 0) return;
-      let idx = list.findIndex(item => item.id === (currentTrack ? currentTrack.id : ''));
-      let nextIdx = (idx + 1) % list.length;
-      startPlay(list[nextIdx]);
+      let idx = list.findIndex(i => i.id === (currentTrack ? currentTrack.id : ''));
+      startPlay(list[(idx + 1) % list.length]);
     }
 
     function playPrev() {
-      if (audio.currentTime > 5) {
-        audio.currentTime = 0;
-        updateLockscreenPosition();
-        return;
-      }
       const list = playlist.length > 0 ? playlist : searchResults;
       if (list.length === 0) return;
-      let idx = list.findIndex(item => item.id === (currentTrack ? currentTrack.id : ''));
-      let prevIdx = (idx - 1 + list.length) % list.length;
-      startPlay(list[prevIdx]);
+      let idx = list.findIndex(i => i.id === (currentTrack ? currentTrack.id : ''));
+      startPlay(list[(idx - 1 + list.length) % list.length]);
     }
 
     function shufflePlay() {
       if (playlist.length === 0) return;
-      const randomIdx = Math.floor(Math.random() * playlist.length);
-      startPlay(playlist[randomIdx]);
+      startPlay(playlist[Math.floor(Math.random() * playlist.length)]);
     }
-
-    function exportPlaylist() {
-      if (playlist.length === 0) return alert("歌單暫無歌曲！");
-      const str = JSON.stringify(playlist);
-      navigator.clipboard.writeText(str).then(() => {
-        alert("✅ 已複製備份碼到剪貼簿！");
-      }).catch(() => {
-        prompt("請複製備份碼：", str);
-      });
-    }
-
-    function importPlaylist() {
-      const input = prompt("請貼上備份碼：");
-      if (!input) return;
-      try {
-        const parsed = JSON.parse(input);
-        if (Array.isArray(parsed)) {
-          playlist = parsed;
-          savePlaylistToStorage();
-          renderPlaylist();
-          alert(`✅ 成功匯入 ${playlist.length} 首歌！`);
-        }
-      } catch (e) {
-        alert("❌ 格式不正確！");
-      }
-    }
-
-    audio.addEventListener('play', () => {
-      setPlayState(true);
-      updateLockscreenPosition();
-    });
-    audio.addEventListener('pause', () => {
-      setPlayState(false);
-      updateLockscreenPosition();
-    });
-    audio.addEventListener('loadedmetadata', () => {
-      updateLockscreenPosition();
-    });
-    audio.addEventListener('ended', () => playNext());
 
     audio.addEventListener('timeupdate', () => {
       if (!isSeeking && audio.duration) {
-        const pct = (audio.currentTime / audio.duration) * 100;
-        seekSlider.value = pct;
+        seekSlider.value = (audio.currentTime / audio.duration) * 100;
         currTimeLabel.innerText = formatTime(audio.currentTime);
         totalTimeLabel.innerText = formatTime(audio.duration);
-        updateLockscreenPosition();
       }
     });
 
-    seekSlider.addEventListener('input', () => {
-      isSeeking = true;
-      if (audio.duration) {
-        const target = (seekSlider.value / 100) * audio.duration;
-        currTimeLabel.innerText = formatTime(target);
-      }
-    });
-
+    seekSlider.addEventListener('input', () => { isSeeking = true; });
     seekSlider.addEventListener('change', () => {
-      if (audio.duration) {
-        audio.currentTime = (seekSlider.value / 100) * audio.duration;
-        updateLockscreenPosition();
-      }
+      if (audio.duration) audio.currentTime = (seekSlider.value / 100) * audio.duration;
       isSeeking = false;
     });
 
     function formatTime(sec) {
       if (!sec || isNaN(sec)) return '0:00';
-      const total = Math.floor(sec);
-      const m = Math.floor(total / 60);
-      const s = total % 60;
+      const m = Math.floor(sec / 60), s = Math.floor(sec % 60);
       return `${m}:${s < 10 ? '0' : ''}${s}`;
     }
 
     function escapeHtml(str) {
-      const div = document.createElement('div');
-      div.textContent = str || '';
-      return div.innerHTML;
+      const d = document.createElement('div'); d.textContent = str || ''; return d.innerHTML;
     }
 
-    document.getElementById('keyword').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') searchVideos();
-    });
-
-    window.addEventListener('DOMContentLoaded', () => {
-      searchVideos();
-    });
+    window.addEventListener('DOMContentLoaded', () => { searchVideos(); });
   </script>
 </body>
 </html>
