@@ -1,7 +1,8 @@
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Range');
+  res.setHeader('Accept-Ranges', 'bytes');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
 
@@ -10,17 +11,18 @@ export default async function handler(req, res) {
 
   const videoUrl = `https://www.youtube.com/watch?v=${id}`;
 
-  // 專門解析 YouTube 原始音軌嘅高可用開源 Cobalt 實例群
-  const instances = [
+  const cobaltInstances = [
     "https://api.cobalt.tools/api/json",
     "https://cobalt-api.kwiatekm.tokyo/api/json",
     "https://api.server.ovh/api/json"
   ];
 
-  for (const apiUrl of instances) {
+  let audioUrl = null;
+
+  for (const apiUrl of cobaltInstances) {
     try {
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 6000);
+      const timer = setTimeout(() => controller.abort(), 5000);
 
       const resp = await fetch(apiUrl, {
         method: "POST",
@@ -42,14 +44,38 @@ export default async function handler(req, res) {
 
       const data = await resp.json();
       if (data && data.url) {
-        // 直接 302 重定向到解密後嘅高音質直連音訊，秒出聲且不食 Vercel 頻寬流量
-        return res.redirect(302, data.url);
+        audioUrl = data.url;
+        break;
       }
-    } catch (e) {
-      // 嘗試下一組節點
-    }
+    } catch (e) {}
   }
 
-  // 保底備用線路
-  return res.redirect(302, `https://invidious.nerdvpn.de/latest_version?id=${id}&itag=140&local=true`);
+  // 若 Cobalt 實例均忙，使用 Invidious 專用音訊中轉
+  if (!audioUrl) {
+    audioUrl = `https://invidious.nerdvpn.de/latest_version?id=${id}&itag=140&local=true`;
+  }
+
+  try {
+    const audioResp = await fetch(audioUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+      }
+    });
+
+    if (!audioResp.ok) throw new Error("Audio source failed");
+
+    res.setHeader('Content-Type', audioResp.headers.get('content-type') || 'audio/mp4');
+    const contentLength = audioResp.headers.get('content-length');
+    if (contentLength) res.setHeader('Content-Length', contentLength);
+
+    const reader = audioResp.body.getReader();
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      res.write(value);
+    }
+    return res.end();
+  } catch (err) {
+    return res.status(502).send('Stream error');
+  }
 }
