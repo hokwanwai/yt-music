@@ -3,45 +3,53 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
+  if (req.method === 'OPTIONS') return res.status(200).end();
 
   const { id } = req.query;
-  if (!id) {
-    return res.status(400).send('Missing video ID');
-  }
+  if (!id) return res.status(400).send('Missing video ID');
 
-  const candidates = [
-    `https://inv.tux.pizza/latest_version?id=${id}&itag=140&local=true`,
-    `https://invidious.nerdvpn.de/latest_version?id=${id}&itag=140&local=true`,
-    `https://yt.artemislena.eu/latest_version?id=${id}&itag=140&local=true`
+  const videoUrl = `https://www.youtube.com/watch?v=${id}`;
+
+  // 專門解析 YouTube 原始音軌嘅高可用開源 Cobalt 實例群
+  const instances = [
+    "https://api.cobalt.tools/api/json",
+    "https://cobalt-api.kwiatekm.tokyo/api/json",
+    "https://api.server.ovh/api/json"
   ];
 
-  for (const streamUrl of candidates) {
+  for (const apiUrl of instances) {
     try {
-      const response = await fetch(streamUrl, {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 6000);
+
+      const resp = await fetch(apiUrl, {
+        method: "POST",
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-        }
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          "User-Agent": "Mozilla/5.0"
+        },
+        body: JSON.stringify({
+          url: videoUrl,
+          downloadMode: "audio",
+          audioFormat: "mp3"
+        }),
+        signal: controller.signal
       });
 
-      if (response.ok && response.body) {
-        res.setHeader('Content-Type', 'audio/mp4');
-        res.setHeader('Cache-Control', 'public, max-age=3600');
+      clearTimeout(timer);
+      if (!resp.ok) continue;
 
-        const reader = response.body.getReader();
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          res.write(value);
-        }
-        return res.end();
+      const data = await resp.json();
+      if (data && data.url) {
+        // 直接 302 重定向到解密後嘅高音質直連音訊，秒出聲且不食 Vercel 頻寬流量
+        return res.redirect(302, data.url);
       }
     } catch (e) {
-      console.warn('嘗試下一個串流源...', streamUrl);
+      // 嘗試下一組節點
     }
   }
 
-  return res.status(502).send('Audio stream currently unavailable');
+  // 保底備用線路
+  return res.redirect(302, `https://invidious.nerdvpn.de/latest_version?id=${id}&itag=140&local=true`);
 }
