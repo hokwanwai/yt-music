@@ -176,7 +176,6 @@
       if (tab === 'playlist') renderPlaylist(); else renderSearchResults();
     }
 
-    // 直接透過自家 Vercel API 搜尋，解決手機直接連線被擋問題
     async function searchVideos() {
       const q = document.getElementById('keyword').value.trim();
       if (!q) return;
@@ -261,12 +260,14 @@
       renderSearchResults();
     }
 
-    // 播放歌曲：直接透過同源 Vercel API
     function startPlay(track) {
       currentTrack = track;
       document.getElementById('npTitle').innerText = track.title;
-      document.getElementById('npArtist').innerText = "⏳ 正在載入音訊...";
+      document.getElementById('npArtist').innerText = "⏳ 正在連接音訊...";
       document.getElementById('npThumb').src = track.thumb;
+
+      // 每次換歌重設播放圖示為加載狀態
+      playIcon.className = 'fa-solid fa-circle-notch fa-spin';
 
       audio.src = `/api/stream?id=${track.id}`;
       audio.load();
@@ -286,16 +287,44 @@
       audio.play().then(() => {
         document.getElementById('npArtist').innerText = track.author;
         playIcon.className = 'fa-solid fa-pause';
-      }).catch(() => {
+      }).catch((err) => {
+        // 如果自動播放被瀏覽器阻擋，恢復三角形讓用戶手動點擊
+        playIcon.className = 'fa-solid fa-play';
         document.getElementById('npArtist').innerText = "點擊播放鍵開始";
       });
     }
 
+    // 播放/暫停按鈕邏輯
     function togglePlayPause() {
-      if (!audio.src) { if (playlist.length > 0) startPlay(playlist[0]); return; }
-      if (audio.paused) { audio.play(); playIcon.className = 'fa-solid fa-pause'; }
-      else { audio.pause(); playIcon.className = 'fa-solid fa-play'; }
+      if (!audio.src) {
+        if (playlist.length > 0) startPlay(playlist[0]);
+        return;
+      }
+      if (audio.paused) {
+        audio.play().then(() => {
+          playIcon.className = 'fa-solid fa-pause';
+        }).catch(() => {
+          playIcon.className = 'fa-solid fa-play';
+        });
+      } else {
+        audio.pause();
+        playIcon.className = 'fa-solid fa-play';
+      }
     }
+
+    audio.addEventListener('playing', () => {
+      playIcon.className = 'fa-solid fa-pause';
+      if (currentTrack) document.getElementById('npArtist').innerText = currentTrack.author;
+    });
+
+    audio.addEventListener('pause', () => {
+      playIcon.className = 'fa-solid fa-play';
+    });
+
+    audio.addEventListener('error', () => {
+      playIcon.className = 'fa-solid fa-play';
+      document.getElementById('npArtist').innerText = "音訊加載中，請再按一次播放";
+    });
 
     function playNext() {
       const list = playlist.length > 0 ? playlist : searchResults;
