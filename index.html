@@ -42,7 +42,6 @@
       padding-top: env(safe-area-inset-top);
     }
 
-    /* 頂部導航欄（修復手機斷行擠迫問題） */
     header {
       padding: 12px 12px 6px;
       flex-shrink: 0;
@@ -77,7 +76,6 @@
       font-size: 1.35rem;
     }
 
-    /* 睡眠定時按鈕（鎖定不換行） */
     .sleep-btn {
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.12);
@@ -130,7 +128,6 @@
       color: #000;
     }
 
-    /* 搜尋欄 */
     .search-wrapper {
       padding: 6px 12px 10px;
       display: flex;
@@ -193,7 +190,6 @@
       white-space: nowrap;
     }
 
-    /* 歌單工具列 */
     .playlist-toolbar {
       padding: 4px 12px 10px;
       display: none;
@@ -217,7 +213,6 @@
       white-space: nowrap;
     }
 
-    /* 主列表捲動區 */
     main {
       flex: 1;
       overflow-y: auto;
@@ -237,7 +232,6 @@
       margin: 6px 4px 2px;
     }
 
-    /* 歌曲卡片 */
     .track-item {
       display: flex;
       align-items: center;
@@ -334,7 +328,6 @@
       color: var(--sp-green);
     }
 
-    /* 底部懸浮全功能播放艙 */
     footer {
       position: fixed;
       bottom: calc(10px + env(safe-area-inset-bottom));
@@ -541,7 +534,7 @@
   <div class="search-wrapper" id="searchSection">
     <div class="search-input-box">
       <i class="fa-solid fa-magnifying-glass search-icon"></i>
-      <input type="text" id="keyword" placeholder="輸入歌手、歌名或 Podcast..." value="陳奕迅">
+      <input type="text" id="keyword" placeholder="輸入歌手、歌名（建議加 Lyrics）..." value="陳奕迅">
       <button class="clear-btn" onclick="clearSearchInput()" title="清除">
         <i class="fa-solid fa-circle-xmark"></i>
       </button>
@@ -598,14 +591,14 @@
   </footer>
 
   <script>
-    // 雙引擎多通道節點池（整合 Piped + Invidious + 跨域穿透 Proxy）
     const PIPED_HOSTS = [
       "https://pipedapi.kavin.rocks",
       "https://pipedapi.leptons.xyz",
       "https://pipedapi.nosebs.ru",
       "https://piped-api.garudalinux.org",
       "https://pipedapi.r4fo.com",
-      "https://pipedapi.ducks.party"
+      "https://pipedapi.ducks.party",
+      "https://api.piped.private.coffee"
     ];
 
     const INVIDIOUS_HOSTS = [
@@ -613,14 +606,15 @@
       "https://invidious.nerdvpn.de",
       "https://invidious.privacyredirect.com",
       "https://yt.artemislena.eu",
-      "https://invidious.jing.rocks"
+      "https://invidious.jing.rocks",
+      "https://inv.nadeko.net",
+      "https://invidious.protokolla.fi"
     ];
 
-    // CORS 穿透代理（解決 GitHub Pages 瀏覽器直接連線被拒問題）
     const CORS_PROXIES = [
-      (url) => url, // 先試直連
-      (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-      (url) => `https://corsproxy.io/?${encodeURIComponent(url)}`
+      (url) => url,
+      (url) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+      (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
     ];
 
     let currentTab = 'search';
@@ -628,6 +622,7 @@
     let currentTrack = null;
     let searchResults = [];
     let isSeeking = false;
+    let playSessionId = 0;
 
     const SLEEP_OPTIONS = [0, 15, 30, 45, 60, 90];
     let sleepOptionIndex = 0;
@@ -735,7 +730,6 @@
       }
     }
 
-    // 單一 URL 超時請求封裝
     async function fetchWithTimeout(url, timeoutMs = 6000) {
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -750,14 +744,10 @@
       }
     }
 
-    // 雙引擎並發搜尋（同時嘗試 Piped 與 Invidious 節點，誰最快回應就用誰）
     async function smartSearch(query) {
       const q = encodeURIComponent(query);
-
-      // 建立候選請求清單
       const tasks = [];
 
-      // 1. Invidious 節點群
       for (const host of INVIDIOUS_HOSTS) {
         for (const wrap of CORS_PROXIES) {
           const target = wrap(`${host}/api/v1/search?q=${q}&type=video`);
@@ -768,7 +758,7 @@
                 id: i.videoId,
                 title: i.title || '未知標題',
                 author: i.author || 'YouTube',
-                thumb: (i.videoThumbnails && i.videoThumbnails[0] ? i.videoThumbnails[0].url : `https://i.ytimg.com/vi/${i.videoId}/hqdefault.jpg`),
+                thumb: `https://i.ytimg.com/vi/${i.videoId}/hqdefault.jpg`,
                 duration: i.lengthSeconds || 0
               }));
             })
@@ -776,7 +766,6 @@
         }
       }
 
-      // 2. Piped 節點群
       for (const host of PIPED_HOSTS) {
         for (const wrap of CORS_PROXIES) {
           const target = wrap(`${host}/search?q=${q}&filter=videos`);
@@ -790,7 +779,7 @@
                   id: vid,
                   title: i.title || '未知標題',
                   author: i.uploaderName || 'YouTube',
-                  thumb: i.thumbnail || `https://i.ytimg.com/vi/${vid}/hqdefault.jpg`,
+                  thumb: `https://i.ytimg.com/vi/${vid}/hqdefault.jpg`,
                   duration: i.duration || 0
                 };
               });
@@ -799,53 +788,101 @@
         }
       }
 
-      // 使用 Promise.any：只要全世界任何一個節點成功返回，即刻秒速顯示！
       return await Promise.any(tasks);
     }
 
-    // 雙引擎並發提取音訊串流
-    async function smartGetAudioStreams(videoId) {
-      const tasks = [];
+    // 收集多條經過「伺服器中轉解除 IP 鎖」嘅可用音訊流清單
+    async function getCandidateStreamUrls(videoId) {
+      const canPlayOpus = audio.canPlayType('audio/webm; codecs="opus"') !== "";
+      const candidateList = [];
 
-      // 1. Piped 串流
+      // 1. 先放入各個 Invidious 節點嘅直接中轉網址 (local=true 專門破解 YouTube 403 IP 鎖)
+      // itag 251 = 160kbps Opus, itag 140 = 128kbps M4A
+      for (const host of INVIDIOUS_HOSTS) {
+        if (canPlayOpus) {
+          candidateList.push({
+            url: `${host}/latest_version?id=${videoId}&itag=251&local=true`,
+            codec: 'OPUS',
+            kbps: '160kbps'
+          });
+        }
+        candidateList.push({
+          url: `${host}/latest_version?id=${videoId}&itag=140&local=true`,
+          codec: 'AAC',
+          kbps: '128kbps'
+        });
+      }
+
+      // 2. 同時嘗試經 API 拎 Piped 嘅中轉串流（如果最快返嚟就插隊到最前）
+      const apiTasks = [];
       for (const host of PIPED_HOSTS) {
         for (const wrap of CORS_PROXIES) {
           const target = wrap(`${host}/streams/${videoId}`);
-          tasks.push(
-            fetchWithTimeout(target, 7000).then(data => {
+          apiTasks.push(
+            fetchWithTimeout(target, 4500).then(data => {
               if (!data || !data.audioStreams || data.audioStreams.length === 0) throw new Error("No streams");
-              return data.audioStreams.map(s => ({
+              const streams = data.audioStreams;
+              streams.sort((a, b) => (b.bitrate || 0) - (a.bitrate || 0));
+              return streams.map(s => ({
                 url: s.url,
-                mimeType: s.mimeType || '',
-                format: s.format || '',
-                bitrate: s.bitrate || 128000
+                codec: (s.mimeType && s.mimeType.includes('webm')) ? 'OPUS' : 'AAC',
+                kbps: s.bitrate ? Math.round(s.bitrate / 1000) + 'kbps' : 'HQ'
               }));
             })
           );
         }
       }
 
-      // 2. Invidious 串流
-      for (const host of INVIDIOUS_HOSTS) {
-        for (const wrap of CORS_PROXIES) {
-          const target = wrap(`${host}/api/v1/videos/${videoId}`);
-          tasks.push(
-            fetchWithTimeout(target, 7000).then(data => {
-              if (!data || !data.adaptiveFormats) throw new Error("No adaptiveFormats");
-              const audios = data.adaptiveFormats.filter(f => f.type && f.type.startsWith('audio/'));
-              if (audios.length === 0) throw new Error("No audio formats");
-              return audios.map(a => ({
-                url: a.url,
-                mimeType: a.type || '',
-                format: a.encoding || '',
-                bitrate: parseInt(a.bitrate || '128000', 10)
-              }));
-            })
-          );
-        }
+      try {
+        const pipedStreams = await Promise.any(apiTasks);
+        return [...pipedStreams, ...candidateList];
+      } catch (e) {
+        return candidateList;
       }
+    }
 
-      return await Promise.any(tasks);
+    // 測試單一音訊 URL 是否真係播到聲（突破 403 驗證）
+    function tryPlayUrl(streamObj, session) {
+      return new Promise((resolve, reject) => {
+        if (session !== playSessionId) return reject(new Error("Cancelled"));
+
+        let settled = false;
+        const timer = setTimeout(() => {
+          if (!settled) {
+            settled = true;
+            cleanup();
+            reject(new Error("Stream timeout"));
+          }
+        }, 6500);
+
+        const onCanPlay = () => {
+          if (!settled) {
+            settled = true;
+            cleanup();
+            audio.play().then(() => resolve(streamObj)).catch(reject);
+          }
+        };
+
+        const onError = () => {
+          if (!settled) {
+            settled = true;
+            cleanup();
+            reject(new Error("Stream error"));
+          }
+        };
+
+        function cleanup() {
+          clearTimeout(timer);
+          audio.removeEventListener('canplay', onCanPlay);
+          audio.removeEventListener('error', onError);
+        }
+
+        audio.addEventListener('canplay', onCanPlay, { once: true });
+        audio.addEventListener('error', onError, { once: true });
+
+        audio.src = streamObj.url;
+        audio.load();
+      });
     }
 
     async function searchVideos() {
@@ -984,24 +1021,6 @@
       renderPlaylist();
     }
 
-    function pickBestAudioStream(streams) {
-      if (!streams || streams.length === 0) return null;
-
-      const canPlayOpus = audio.canPlayType('audio/webm; codecs="opus"') !== "";
-      let candidates = streams;
-
-      if (!canPlayOpus) {
-        const m4aOnly = streams.filter(s => 
-          (s.mimeType && s.mimeType.includes('mp4')) || 
-          (s.format && s.format.includes('M4A'))
-        );
-        if (m4aOnly.length > 0) candidates = m4aOnly;
-      }
-
-      candidates.sort((a, b) => (b.bitrate || 0) - (a.bitrate || 0));
-      return candidates[0];
-    }
-
     function updateLockscreenPosition() {
       if ('mediaSession' in navigator && 'setPositionState' in navigator.mediaSession) {
         if (audio.duration && !isNaN(audio.duration) && isFinite(audio.duration)) {
@@ -1018,77 +1037,87 @@
 
     async function startPlay(track) {
       currentTrack = track;
+      const mySession = ++playSessionId;
 
       const npTitle = document.getElementById('npTitle');
       const npArtist = document.getElementById('npArtist');
       const npThumb = document.getElementById('npThumb');
 
       npTitle.innerText = track.title;
-      npArtist.innerHTML = "⏳ 正在連接高音質音軌...";
+      npArtist.innerHTML = "⏳ 正在建立免封鎖音訊通道...";
       npThumb.src = track.thumb;
 
       if (currentTab === 'search') renderSearchResults();
       if (currentTab === 'playlist') renderPlaylist();
 
-      try {
-        const streams = await smartGetAudioStreams(track.id);
-        const bestAudio = pickBestAudioStream(streams);
-        if (!bestAudio) throw new Error("無音訊串流");
+      const candidates = await getCandidateStreamUrls(track.id);
+      let connectedStream = null;
 
-        audio.src = bestAudio.url;
-        if (sleepRemainingSec > 10 || sleepRemainingSec === 0) {
-          audio.volume = 1.0;
+      // 逐個中轉通道嘗試播放，直到成功出聲為止
+      for (let i = 0; i < candidates.length; i++) {
+        if (mySession !== playSessionId) return;
+        npArtist.innerHTML = `⏳ 正在切換音訊線路 (${i + 1}/${Math.min(candidates.length, 8)})...`;
+        try {
+          connectedStream = await tryPlayUrl(candidates[i], mySession);
+          if (connectedStream) break;
+        } catch (e) {
+          console.warn("線路切換:", candidates[i].url);
         }
-
-        const kbps = bestAudio.bitrate ? Math.round(bestAudio.bitrate / 1000) + 'kbps' : 'HQ';
-        const isOpus = (bestAudio.mimeType && bestAudio.mimeType.includes('webm')) || (bestAudio.format && bestAudio.format.includes('OPUS'));
-        const codecLabel = isOpus ? 'OPUS' : 'AAC';
-        npArtist.innerHTML = `<span class="hq-badge">${codecLabel} ${kbps}</span> <span>${escapeHtml(track.author)}</span>`;
-
-        if ('mediaSession' in navigator) {
-          navigator.mediaSession.metadata = new MediaMetadata({
-            title: track.title,
-            artist: track.author,
-            album: 'TubeAudio Pro',
-            artwork: [
-              { src: track.thumb, sizes: '96x96', type: 'image/jpeg' },
-              { src: track.thumb, sizes: '256x256', type: 'image/jpeg' },
-              { src: track.thumb, sizes: '512x512', type: 'image/jpeg' }
-            ]
-          });
-
-          navigator.mediaSession.setActionHandler('play', () => audio.play());
-          navigator.mediaSession.setActionHandler('pause', () => audio.pause());
-          navigator.mediaSession.setActionHandler('previoustrack', () => playPrev());
-          navigator.mediaSession.setActionHandler('nexttrack', () => playNext());
-
-          navigator.mediaSession.setActionHandler('seekbackward', (details) => {
-            const skipTime = details.seekOffset || 10;
-            audio.currentTime = Math.max(audio.currentTime - skipTime, 0);
-            updateLockscreenPosition();
-          });
-          navigator.mediaSession.setActionHandler('seekforward', (details) => {
-            const skipTime = details.seekOffset || 10;
-            audio.currentTime = Math.min(audio.currentTime + skipTime, audio.duration || 0);
-            updateLockscreenPosition();
-          });
-
-          navigator.mediaSession.setActionHandler('seekto', (details) => {
-            if (details.fastSeek && 'fastSeek' in audio) {
-              audio.fastSeek(details.seekTime);
-            } else {
-              audio.currentTime = details.seekTime;
-            }
-            updateLockscreenPosition();
-          });
-        }
-
-        await audio.play();
-        setPlayState(true);
-      } catch (err) {
-        npArtist.innerHTML = "⚠️ 此曲目受保護或節點繁忙，請換另一首";
-        setPlayState(false);
       }
+
+      if (mySession !== playSessionId) return;
+
+      if (!connectedStream) {
+        npArtist.innerHTML = "⚠️ 官方 MV 版權鎖死，請搜尋「歌名 + Lyrics」版本";
+        setPlayState(false);
+        return;
+      }
+
+      if (sleepRemainingSec > 10 || sleepRemainingSec === 0) {
+        audio.volume = 1.0;
+      }
+
+      npArtist.innerHTML = `<span class="hq-badge">${connectedStream.codec} ${connectedStream.kbps}</span> <span>${escapeHtml(track.author)}</span>`;
+
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: track.title,
+          artist: track.author,
+          album: 'TubeAudio Pro',
+          artwork: [
+            { src: track.thumb, sizes: '96x96', type: 'image/jpeg' },
+            { src: track.thumb, sizes: '256x256', type: 'image/jpeg' },
+            { src: track.thumb, sizes: '512x512', type: 'image/jpeg' }
+          ]
+        });
+
+        navigator.mediaSession.setActionHandler('play', () => audio.play());
+        navigator.mediaSession.setActionHandler('pause', () => audio.pause());
+        navigator.mediaSession.setActionHandler('previoustrack', () => playPrev());
+        navigator.mediaSession.setActionHandler('nexttrack', () => playNext());
+
+        navigator.mediaSession.setActionHandler('seekbackward', (details) => {
+          const skipTime = details.seekOffset || 10;
+          audio.currentTime = Math.max(audio.currentTime - skipTime, 0);
+          updateLockscreenPosition();
+        });
+        navigator.mediaSession.setActionHandler('seekforward', (details) => {
+          const skipTime = details.seekOffset || 10;
+          audio.currentTime = Math.min(audio.currentTime + skipTime, audio.duration || 0);
+          updateLockscreenPosition();
+        });
+
+        navigator.mediaSession.setActionHandler('seekto', (details) => {
+          if (details.fastSeek && 'fastSeek' in audio) {
+            audio.fastSeek(details.seekTime);
+          } else {
+            audio.currentTime = details.seekTime;
+          }
+          updateLockscreenPosition();
+        });
+      }
+
+      setPlayState(true);
     }
 
     function togglePlayPause() {
